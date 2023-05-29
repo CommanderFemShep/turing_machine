@@ -7,7 +7,8 @@ usable by clients and better reflect good software practices.
 Given the set of instructions from the given input file, the transition map is built with input keys 
 from_state & from_char, and maps to a dictionary of values to_char, direction, to_state. Running the 
 Turing Machine essentially takes the transition map and runs the tape (given word) against it by checking the 
-present state and char it's on and seeing if it moves left, right, or halts. If it halts, the word is accepted.
+present state and char the tape is on and seeing if it moves left, right, or halts. If it halts, the word is accepted.
+Otherwise the word is rejected.
 """
 
 
@@ -17,13 +18,15 @@ class TuringMachine:
 		The class TuringMachine builds a transition map from the given input file 'filepath' and runs the
 		given tape against it to see if the word is accepted or rejected by the Turing Machine.
 
-		:param filepath: Text file in current directory, either 'doublea.txt' or 'palindrome.txt'
+		:param filepath: Text file in current directory, i.e. 'doublea.txt' or 'palindrome.txt'
 		:param max_length: Integer for maximum length of tape
 		"""
 		self.filepath = filepath
 		self.max_length = max_length
 		if not os.path.isfile(self.filepath):
 			raise FileNotFoundError(f'`{self.filepath}` is not a valid filepath')
+		if not isinstance(max_length, int) or max_length <= 0:
+			raise ValueError('Invalid max_length, must be a positive integer')
 		self.transition_map, self.start_state = None, None
 		self.build_transition_map()
 
@@ -71,15 +74,28 @@ class TuringMachine:
 		self.transition_map = transition_map
 		self.start_state = start_state
 
-	def run(self, tape):
+	def get_tape(self, word: str):
+		"""
+		Takes input word and returns a tape digestible by TuringMachine
+
+		:param word: String to be turned into a tape
+		:return: List of chars from input 'word' followed by underscores up to max_length
+		"""
+		return [letter for letter in word] + (['_'] * (self.max_length - len(word)))
+
+	def run_machine(self, tape):
 		"""
 		Iterative function to check each letter of the provided word until it's accepted or rejected.
 
-		:param tape: List of chars
+		:param tape: List of chars, or string
 		:return: Boolean on whether the tape was accepted or rejected
 		"""
+		if isinstance(tape, str):
+			# converts a given word into a tape if it is just a string
+			tape = self.get_tape(tape)
+		if '_' not in tape:
+			raise ValueError(f'Tape length is longer than {self.max_length}')
 		tape_position = 0  # updated with index of tape list as it moves (aka the head)
-		trans_count = 0
 		from_state = self.start_state
 		for trans_count in range(self.max_length):
 			if tape_position < 0:

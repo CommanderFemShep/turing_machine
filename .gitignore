@@ -2,3 +2,4 @@ tmp/
 .idea/
 venv
 turing/__pycache__/
+tests/__pycache__/
