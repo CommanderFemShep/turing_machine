@@ -1,8 +1,4 @@
-bin/TuringMachine
-bin/TuringMachine.class
-
-TuringMachine.class
-
 tmp/
-
-
+.idea/
+venv
+turing/__pycache__/
